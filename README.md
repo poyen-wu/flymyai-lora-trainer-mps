@@ -34,10 +34,10 @@ Agentic Infra for GenAI. FlyMy.AI is a B2B infrastructure for building and runni
 **🚧 Under Development:** We are actively working on improving the code and adding test coverage. The project is in the refinement stage but ready for use.
 
 **📋 Development Plans:**
-- ✅ Code stability improvements
-- ✅ Adding comprehensive tests
-- ✅ Performance optimization
-- ✅ Documentation expansion
+- ✅ Basic code is working
+- ✅ Training functionality implemented
+- 🔄 Performance optimization in progress
+- 🔜 Test coverage coming soon
 
 ---
 
