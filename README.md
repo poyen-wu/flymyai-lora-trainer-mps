@@ -1,16 +1,26 @@
 # LoRA Training for Qwen-Image
 
+
+
 An open-source implementation for training LoRA (Low-Rank Adaptation) layers for Qwen/Qwen-Image models by [FlyMy.AI](https://flymy.ai).
+
+<p align="center">
+  <img src="./assets/flymy_transparent.png" alt="FlyMy.AI Logo" width="256">
+</p>
 
 ## 🌟 About FlyMy.AI
 
-[FlyMy.AI](https://flymy.ai) is an innovative platform for image generation and AI work. We specialize in creating cutting-edge solutions for generative AI and actively support the open-source community.
-![Sample Output](./assets/flymy_transparent.png)
+Agentic Infra for GenAI. FlyMy.AI is a B2B infrastructure for building and running GenAI Media agents.
+
 
 **🔗 Useful Links:**
 - 🌐 [Official Website](https://flymy.ai)
-- 📚 [Documentation](https://docs.flymy.ai)
-- 💬 [Community](https://community.flymy.ai)
+- 📚 [Documentation](https://docs.flymy.ai/intro)
+- 💬 [Discord Community](https://discord.com/invite/t6hPBpSebw)
+- 🐦 [X (Twitter)](https://x.com/flymyai)
+- 💼 [LinkedIn](https://linkedin.com/company/flymyai)
+- 📺 [YouTube](https://youtube.com/@flymyai)
+- 📸 [Instagram](https://www.instagram.com/flymy_ai)
 
 ## 🚀 Features
 
@@ -120,6 +130,9 @@ image.save("output.png")
 
 If you have questions or suggestions, join our community:
 - 🌐 [FlyMy.AI](https://flymy.ai)
+- 💬 [Discord Community](https://discord.com/invite/t6hPBpSebw)
+- 🐦 [Follow us on X](https://x.com/flymyai)
+- 💼 [Connect on LinkedIn](https://linkedin.com/company/flymyai)
 - 📧 [Support](mailto:support@flymy.ai)
 
 **⭐ Don't forget to star the repository if you like it!**
