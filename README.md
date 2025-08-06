@@ -17,7 +17,7 @@ Agentic Infra for GenAI. FlyMy.AI is a B2B infrastructure for building and runni
 - 🌐 [Official Website](https://flymy.ai)
 - 📚 [Documentation](https://docs.flymy.ai/intro)
 - 💬 [Discord Community](https://discord.com/invite/t6hPBpSebw)
-- 🤗 [Pre-trained LoRA Model](https://huggingface.co/flymy-ai/qwen-image-lora)
+- 🤗 [Pre-trained LoRA Model](https://huggingface.co/flymy-ai/qwen-image-realism-lora)
 - 🐦 [X (Twitter)](https://x.com/flymyai)
 - 💼 [LinkedIn](https://linkedin.com/company/flymyai)
 - 📺 [YouTube](https://youtube.com/@flymyai)
@@ -63,10 +63,10 @@ Agentic Infra for GenAI. FlyMy.AI is a B2B infrastructure for building and runni
 4. Download pre-trained LoRA weights (optional):
    ```bash
    # Clone the repository with LoRA weights
-   git clone https://huggingface.co/flymy-ai/qwen-image-lora
+   git clone https://huggingface.co/flymy-ai/qwen-image-realism-lora
    
    # Or download specific files
-   wget https://huggingface.co/flymy-ai/qwen-image-lora/resolve/main/pytorch_lora_weights.safetensors
+   wget https://huggingface.co/flymy-ai/qwen-image-realism-lora/resolve/main/flymy_realism.safetensors
    ```
 
 ---
@@ -107,15 +107,15 @@ pipe = pipe.to(device)
 
 ```python
 # Load LoRA weights
-pipe.load_lora_weights('flymy-ai/qwen-image-lora', adapter_name="lora")
+pipe.load_lora_weights('flymy-ai/qwen-image-realism-lora', adapter_name="lora")
 ```
 
 ### 🎨 Generate Image with lora trained on person
-You can find LoRA weights [here](https://huggingface.co/flymy-ai/qwen-image-lora)
+You can find LoRA weights [here](https://huggingface.co/flymy-ai/qwen-image-realism-lora)
 
-Trigger word: **Valentin**
+No trigger word required
 ```python
-prompt = '''Valentin in a natural daylight selfie at a cafe entrance. He looks seriously into the camera, wearing a black coat or jacket and wireless earbud. Background includes wooden frames, warm pendant lights, and urban cafe details. With text "FLYMY AI"'''
+prompt = '''Super Realism portrait of a teenager woman of African descent, serene calmness, arms crossed, illuminated by dramatic studio lighting, sunlit park in the background, adorned with delicate jewelry, three-quarter view, sun-kissed skin with natural imperfections, loose shoulder-length curls, slightly squinting eyes, environmental street portrait with text "FLYMY AI" on t-shirt.'''
 negative_prompt =  " "
 image = pipe(
     prompt=prompt,
@@ -135,7 +135,7 @@ image.save("output.png")
 
 ### 🖼️ Sample Output
 
-![Sample Output](./assets/Valentin.jpg)
+![Sample Output](./assets/lora.png)
 
 
 ## 🤝 Support
