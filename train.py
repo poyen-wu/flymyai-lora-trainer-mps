@@ -1,64 +1,40 @@
 import argparse
-import logging
-import math
-import os
-import re
-import random
-import shutil
-from contextlib import nullcontext
-from pathlib import Path
-from safetensors.torch import save_file
 import copy
-import accelerate
-import datasets
-import numpy as np
+from copy import deepcopy
+import logging
+import os
+import shutil
+
 import torch
-import torch.nn.functional as F
-import torch.utils.checkpoint
-import transformers
+from tqdm.auto import tqdm
+
 from accelerate import Accelerator
 from accelerate.logging import get_logger
-from accelerate.state import AcceleratorState
-from accelerate.utils import ProjectConfiguration, set_seed
-from huggingface_hub import create_repo, upload_folder
-from packaging import version
-from tqdm.auto import tqdm
-from diffusers.utils import check_min_version, convert_state_dict_to_diffusers, is_wandb_available
-from peft.utils import get_peft_model_state_dict
-
-from transformers import CLIPTextModel, CLIPTokenizer, AutoTokenizer, T5EncoderModel
-from transformers.utils import ContextManagers
-from omegaconf import OmegaConf
-from copy import deepcopy
+from accelerate.utils import ProjectConfiguration
+import datasets
 import diffusers
-from diffusers import AutoencoderKL, DDPMScheduler, StableDiffusionPipeline
-from diffusers.optimization import get_scheduler
-from diffusers.training_utils import EMAModel, compute_dream_and_update_latents, compute_snr
-from diffusers.utils import check_min_version, deprecate, is_wandb_available, make_image_grid
-from diffusers.utils.hub_utils import load_or_create_model_card, populate_model_card
-from diffusers.utils.import_utils import is_xformers_available
-from diffusers.utils.torch_utils import is_compiled_module
-from einops import rearrange
+from diffusers import FlowMatchEulerDiscreteScheduler
 from diffusers import (
-    AutoencoderKL,
-    FlowMatchEulerDiscreteScheduler,
-    FluxTransformer2DModel,
+    AutoencoderKLQwenImage,
+    QwenImagePipeline,
+    QwenImageTransformer2DModel,
 )
-from diffusers.utils.torch_utils import is_compiled_module
-
-from peft import LoraConfig
-
+from diffusers.optimization import get_scheduler
 from diffusers.training_utils import (
     compute_density_for_timestep_sampling,
     compute_loss_weighting_for_sd3,
-    free_memory,
 )
+from diffusers.utils import convert_state_dict_to_diffusers
+from diffusers.utils.torch_utils import is_compiled_module
 from image_datasets.dataset import loader
-if is_wandb_available():
-    import wandb
+from omegaconf import OmegaConf
+from peft import LoraConfig
+from peft.utils import get_peft_model_state_dict
+import transformers
+
 logger = get_logger(__name__, log_level="INFO")
-from diffusers import FluxPipeline
-from diffusers import QwenImageTransformer2DModel, AutoencoderKLQwenImage, QwenImagePipeline
+
+
 
 
 def parse_args():
@@ -144,7 +120,6 @@ def main():
     flux_transformer.add_adapter(lora_config)
     text_encoding_pipeline.to(accelerator.device)
     noise_scheduler_copy = copy.deepcopy(noise_scheduler)
-    #flux_transformer = parallelize_transformer(transformer=flux_transformer, mesh=mesh)
     def get_sigmas(timesteps, n_dim=4, dtype=torch.float32):
         sigmas = noise_scheduler_copy.sigmas.to(device=accelerator.device, dtype=dtype)
         schedule_timesteps = noise_scheduler_copy.timesteps.to(accelerator.device)
@@ -158,8 +133,7 @@ def main():
         
     vae.requires_grad_(False)
     flux_transformer.requires_grad_(False)
-    #text_encoder_one.requires_grad_(False)
-    #text_encoder_two.requires_grad_(False)
+
 
     flux_transformer.train()
     optimizer_cls = torch.optim.AdamW
@@ -191,9 +165,6 @@ def main():
         num_training_steps=args.max_train_steps * accelerator.num_processes,
     )
     global_step = 0
-    first_epoch = 0
-    #text_encoder_one.to(accelerator.device, dtype=weight_dtype)
-    #text_encoder_two.to(accelerator.device, dtype=weight_dtype)
     vae.to(accelerator.device, dtype=weight_dtype)
     flux_transformer, optimizer, _, lr_scheduler = accelerator.prepare(
         flux_transformer, optimizer, deepcopy(train_dataloader), lr_scheduler
