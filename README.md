@@ -17,6 +17,7 @@ Agentic Infra for GenAI. FlyMy.AI is a B2B infrastructure for building and runni
 - 🌐 [Official Website](https://flymy.ai)
 - 📚 [Documentation](https://docs.flymy.ai/intro)
 - 💬 [Discord Community](https://discord.com/invite/t6hPBpSebw)
+- 🤗 [Pre-trained LoRA Model](https://huggingface.co/flymy-ai/qwen-image-lora)
 - 🐦 [X (Twitter)](https://x.com/flymyai)
 - 💼 [LinkedIn](https://linkedin.com/company/flymyai)
 - 📺 [YouTube](https://youtube.com/@flymyai)
@@ -57,6 +58,15 @@ Agentic Infra for GenAI. FlyMy.AI is a B2B infrastructure for building and runni
 3. Install the latest `diffusers` from GitHub:
    ```bash
    pip install git+https://github.com/huggingface/diffusers
+   ```
+
+4. Download pre-trained LoRA weights (optional):
+   ```bash
+   # Clone the repository with LoRA weights
+   git clone https://huggingface.co/flymy-ai/qwen-image-lora
+   
+   # Or download specific files
+   wget https://huggingface.co/flymy-ai/qwen-image-lora/resolve/main/pytorch_lora_weights.safetensors
    ```
 
 ---
