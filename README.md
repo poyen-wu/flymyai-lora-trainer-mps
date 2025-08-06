@@ -107,11 +107,12 @@ pipe = pipe.to(device)
 
 ```python
 # Load LoRA weights
-pipe.load_lora_weights('pytorch_lora_weights.safetensors', adapter_name="lora")
+pipe.load_lora_weights('flymy-ai/qwen-image-lora', adapter_name="lora")
 ```
 
 ### 🎨 Generate Image with lora trained on person
-
+You can find LoRA weights [here](https://huggingface.co/flymy-ai/qwen-image-lora)
+Trigger word: **Valentin**
 ```python
 prompt = '''Valentin in a natural daylight selfie at a cafe entrance. He looks seriously into the camera, wearing a black coat or jacket and wireless earbud. Background includes wooden frames, warm pendant lights, and urban cafe details. With text "FLYMY AI"'''
 negative_prompt =  " "
