@@ -5,6 +5,7 @@ An open-source implementation for training LoRA (Low-Rank Adaptation) layers for
 ## 🌟 About FlyMy.AI
 
 [FlyMy.AI](https://flymy.ai) is an innovative platform for image generation and AI work. We specialize in creating cutting-edge solutions for generative AI and actively support the open-source community.
+![Sample Output](./assets/flymy_transparent.png)
 
 **🔗 Useful Links:**
 - 🌐 [Official Website](https://flymy.ai)
