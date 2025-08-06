@@ -1,0 +1,15 @@
+accelerate
+deepspeed
+einops==0.8.0
+transformers
+huggingface-hub
+optimum-quanto
+datasets
+omegaconf
+sentencepiece
+opencv-python
+matplotlib
+onnxruntime
+torchvision
+peft
+timm
