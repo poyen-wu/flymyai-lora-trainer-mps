@@ -89,7 +89,7 @@ pipe = pipe.to(device)
 pipe.load_lora_weights('pytorch_lora_weights.safetensors', adapter_name="lora")
 ```
 
-### 🎨 Generate Image
+### 🎨 Generate Image with lora trained on person
 
 ```python
 prompt = '''Valentin in a natural daylight selfie at a cafe entrance. He looks seriously into the camera, wearing a black coat or jacket and wireless earbud. Background includes wooden frames, warm pendant lights, and urban cafe details. With text "FLYMY AI"'''
