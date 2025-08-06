@@ -59,6 +59,7 @@ accelerate launch train.py --config ./train_configs/train_lora.yaml
 ```
 
 Make sure `train_lora.yaml` is correctly set up with paths to your dataset, model, output directory, and other parameters.
+## 🧪 Usage
 
 ---
 ### 🔧 Initialization
