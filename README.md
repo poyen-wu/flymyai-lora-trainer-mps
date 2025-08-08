@@ -223,6 +223,56 @@ image.save("output.png")
 
 ![Sample Output](./assets/lora.png)
 
+---
+
+## 🎛️ Using with ComfyUI
+
+We provide a ready-to-use ComfyUI workflow that works with our trained LoRA models. Follow these steps to set up and use the workflow:
+
+### Setup Instructions
+
+1. **Download the latest ComfyUI**:
+   - Visit the [ComfyUI GitHub repository](https://github.com/comfyanonymous/ComfyUI)
+   - Clone or download the latest version
+
+2. **Install ComfyUI**:
+   - Follow the installation instructions from the [ComfyUI repository](https://github.com/comfyanonymous/ComfyUI?tab=readme-ov-file#installing)
+   - Make sure all dependencies are properly installed
+
+3. **Download Qwen-Image model weights**:
+   - Go to [Qwen-Image ComfyUI weights](https://huggingface.co/Comfy-Org/Qwen-Image_ComfyUI/tree/main)
+   - Download all the model files
+
+4. **Place Qwen-Image weights in ComfyUI**:
+   - Copy the downloaded Qwen-Image model files to the appropriate folders in `ComfyUI/models/`
+   - Follow the folder structure as specified in the model repository
+
+5. **Download our pre-trained LoRA weights**:
+   - Visit [flymy-ai/qwen-image-lora](https://huggingface.co/flymy-ai/qwen-image-lora)
+   - Download the LoRA `.safetensors` files
+
+6. **Place LoRA weights in ComfyUI**:
+   - Copy the LoRA file `flymy-ai/qwen-image-lora/pytorch_lora_weights.safetensors` to `ComfyUI/models/loras/`
+
+7. **Load the workflow**:
+   - Open ComfyUI in your browser
+   - Load the workflow file `qwen_image_lora_example.json` located in this repository
+   - The workflow is pre-configured to work with our LoRA models
+
+### Workflow Features
+
+- ✅ Pre-configured for Qwen-Image + LoRA inference
+- ✅ Optimized settings for best quality output
+- ✅ Easy prompt and parameter adjustment
+- ✅ Compatible with all our trained LoRA models
+
+The ComfyUI workflow provides a user-friendly interface for generating images with our trained LoRA models without needing to write Python code.
+
+### 🖼️ Workflow Screenshot
+
+![ComfyUI Workflow](./assets/comfyui_workflow.png)
+
+---
 
 ## 🤝 Support
 
