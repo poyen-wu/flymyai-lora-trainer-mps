@@ -4,7 +4,7 @@ data_config:
   num_workers: 4
   img_size: 1024
   caption_dropout_rate: 0.1
-  img_dir: meself
+  img_dir: ./your_lora_dataset
   random_ratio: false # support multi crop preprocessing
   caption_type: txt
 report_to: null
@@ -21,10 +21,9 @@ adam_epsilon: 1e-8
 max_grad_norm: 1.0
 logging_dir: logs
 mixed_precision: "bf16"
-checkpointing_steps: 10
+checkpointing_steps: 250
 checkpoints_total_limit: 10
 tracker_project_name: lora_test
 resume_from_checkpoint: latest
 gradient_accumulation_steps: 1
 rank: 16
-
