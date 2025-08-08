@@ -35,6 +35,13 @@ import transformers
 logger = get_logger(__name__, log_level="INFO")
 
 
+def convert_lora_weights_before_save(state_dict):
+    """Convert LoRA weights to ComfyUI compatible format."""
+    new_sd = {}
+    for key, value in state_dict.items():
+        new_key = key.replace("transformer.", "diffusion_model.")
+        new_sd[new_key] = value
+    return new_sd
 
 
 def parse_args():
@@ -324,13 +331,30 @@ def main():
                         get_peft_model_state_dict(unwrapped_flux_transformer)
                     )
 
+                    # Save standard format
                     QwenImagePipeline.save_lora_weights(
                         save_path,
                         flux_transformer_lora_state_dict,
                         safe_serialization=True,
                     )
 
-                    logger.info(f"Saved state to {save_path}")
+                    # Save ComfyUI compatible format
+                    comfyui_save_path = os.path.join(args.output_dir, f"checkpoint-{global_step}-comfyui")
+                    try:
+                        if not os.path.exists(comfyui_save_path):
+                            os.mkdir(comfyui_save_path)
+                    except:
+                        pass
+                    
+                    comfyui_state_dict = convert_lora_weights_before_save(flux_transformer_lora_state_dict)
+                    QwenImagePipeline.save_lora_weights(
+                        comfyui_save_path,
+                        comfyui_state_dict,
+                        safe_serialization=True,
+                    )
+
+                    logger.info(f"Saved standard format to {save_path}")
+                    logger.info(f"Saved ComfyUI format to {comfyui_save_path}")
 
             logs = {"step_loss": loss.detach().item(), "lr": lr_scheduler.get_last_lr()[0]}
             progress_bar.set_postfix(**logs)

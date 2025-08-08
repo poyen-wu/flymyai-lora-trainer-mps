@@ -30,6 +30,14 @@ Agentic Infra for GenAI. FlyMy.AI is a B2B infrastructure for building and runni
 - Easy configuration via YAML
 - Open-source implementation for LoRA training
 
+## 📅 Updates
+
+**08.08.2025**
+- ✅ Added comprehensive dataset preparation instructions
+- ✅ Added automatic checkpoint saving in ComfyUI compatible format
+- ✅ Added dataset validation script (`utils/validate_dataset.py`)
+- ✅ Freeze model weights during training
+
 ## ⚠️ Project Status
 
 **🚧 Under Development:** We are actively working on improving the code and adding test coverage. The project is in the refinement stage but ready for use.
@@ -68,6 +76,84 @@ Agentic Infra for GenAI. FlyMy.AI is a B2B infrastructure for building and runni
    # Or download specific files
    wget https://huggingface.co/flymy-ai/qwen-image-realism-lora/resolve/main/flymy_realism.safetensors
    ```
+
+---
+
+## 📁 Data Preparation
+
+### Dataset Structure
+
+The training data should follow the same format as Flux LoRA training, where each image has a corresponding text file with the same name:
+
+```
+dataset/
+├── img1.png
+├── img1.txt
+├── img2.jpg
+├── img2.txt
+├── img3.png
+├── img3.txt
+└── ...
+```
+
+### Data Format Requirements
+
+1. **Images**: Support common formats (PNG, JPG, JPEG, WEBP)
+2. **Text files**: Plain text files containing image descriptions
+3. **File naming**: Each image must have a corresponding text file with the same base name
+
+### Example Data Structure
+
+```
+my_training_data/
+├── portrait_001.png
+├── portrait_001.txt
+├── landscape_042.jpg
+├── landscape_042.txt
+├── abstract_design.png
+├── abstract_design.txt
+└── style_reference.jpg
+└── style_reference.txt
+```
+
+### Text File Content Examples
+
+**portrait_001.txt:**
+```
+A realistic portrait of a young woman with brown hair, natural lighting, professional photography style
+```
+
+**landscape_042.txt:**
+```
+Mountain landscape at sunset, dramatic clouds, golden hour lighting, wide angle view
+```
+
+**abstract_design.txt:**
+```
+Modern abstract art with geometric shapes, vibrant colors, minimalist composition
+```
+
+### Data Preparation Tips
+
+1. **Image Quality**: Use high-resolution images (recommended 1024x1024 or higher)
+2. **Description Quality**: Write detailed, accurate descriptions of your images
+3. **Consistency**: Maintain consistent style and quality across your dataset
+4. **Dataset Size**: For good results, use at least 10-50 image-text pairs
+5. **Trigger Words**: If training on a specific concept, include consistent trigger words in descriptions
+6. **Auto-generate descriptions**: You can generate image descriptions automatically using [Florence-2](https://huggingface.co/spaces/gokaygokay/Florence-2)
+
+### Quick Data Validation
+
+You can verify your data structure using the included validation utility:
+
+```bash
+python utils/validate_dataset.py --path path/to/your/dataset
+```
+
+This will check that:
+- Each image has a corresponding text file
+- All files follow the correct naming convention
+- Report any missing files or inconsistencies
 
 ---
 
