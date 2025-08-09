@@ -164,6 +164,7 @@ To begin training with your configuration file (e.g., `train_lora_4090.yaml`), r
 ```bash
 accelerate launch train_4090.py --config ./train_configs/train_lora_4090.yaml
 ```
+![Sample Output](./assets/Valentin_24gb.jpg)
 
 
 ## 🏁 Start Training
