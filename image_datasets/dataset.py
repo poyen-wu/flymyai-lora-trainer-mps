@@ -56,44 +56,55 @@ def crop_to_aspect_ratio(image, ratio="16:9"):
 
 
 class CustomImageDataset(Dataset):
-    def __init__(self, img_dir, img_size=512, caption_type='json', random_ratio=False, caption_dropout_rate=0.1):
+    def __init__(self, img_dir, img_size=512, caption_type='txt',
+                 random_ratio=False, caption_dropout_rate=0.1, cached_text_embeddings=None,
+                 cached_image_embeddings=None):
         self.images = [os.path.join(img_dir, i) for i in os.listdir(img_dir) if '.jpg' in i or '.png' in i]
         self.images.sort()
         self.img_size = img_size
         self.caption_type = caption_type
         self.random_ratio = random_ratio
         self.caption_dropout_rate = caption_dropout_rate
+        self.cached_text_embeddings = cached_text_embeddings
+        self.cached_image_embeddings = cached_image_embeddings
+        print('cached_text_embeddings', type(cached_text_embeddings))
     def __len__(self):
         return 999999
 
     def __getitem__(self, idx):
         try:
             idx = random.randint(0, len(self.images) - 1)
-            img = Image.open(self.images[idx]).convert('RGB')
-            if self.random_ratio:
-                ratio = random.choice(["16:9", "default", "1:1", "4:3"])
-                if ratio != "default":
-                    img = crop_to_aspect_ratio(img, ratio)
-            img = image_resize(img, self.img_size)
-            w, h = img.size
-            new_w = (w // 32) * 32
-            new_h = (h // 32) * 32
-            img = img.resize((new_w, new_h))
-            img = torch.from_numpy((np.array(img) / 127.5) - 1)
-            img = img.permute(2, 0, 1)
-            json_path = self.images[idx].split('.')[0] + '.' + self.caption_type
-            if self.caption_type == "json":
-                prompt = json.load(open(json_path))['caption']
+            if self.cached_image_embeddings is None:
+                img = Image.open(self.images[idx]).convert('RGB')
+                if self.random_ratio:
+                    ratio = random.choice(["16:9", "default", "1:1", "4:3"])
+                    if ratio != "default":
+                        img = crop_to_aspect_ratio(img, ratio)
+                img = image_resize(img, self.img_size)
+                w, h = img.size
+                new_w = (w // 32) * 32
+                new_h = (h // 32) * 32
+                img = img.resize((new_w, new_h))
+                img = torch.from_numpy((np.array(img) / 127.5) - 1)
+                img = img.permute(2, 0, 1)
             else:
-                prompt = open(json_path).read()
-            if throw_one(self.caption_dropout_rate):
-                return img, " "
+                img = self.cached_image_embeddings[self.images[idx].split('/')[-1]]
+            txt_path = self.images[idx].split('.')[0] + '.' + self.caption_type
+            if self.cached_text_embeddings is None:
+                prompt = open(txt_path).read()
+                if throw_one(self.caption_dropout_rate):
+                    return img, " "
+                else:
+                    return img, prompt
             else:
-                return img, prompt
+                txt = txt_path.split('/')[-1]
+                if throw_one(self.caption_dropout_rate):
+                    return img, self.cached_text_embeddings['empty_embedding']['prompt_embeds'], self.cached_text_embeddings['empty_embedding']['prompt_embeds_mask']
+                else:
+                    return img, self.cached_text_embeddings[txt]['prompt_embeds'], self.cached_text_embeddings[txt]['prompt_embeds_mask']
         except Exception as e:
             print(e)
             return self.__getitem__(random.randint(0, len(self.images) - 1))
-
 
 def loader(train_batch_size, num_workers, **args):
     dataset = CustomImageDataset(**args)

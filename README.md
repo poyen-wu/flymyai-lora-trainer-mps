@@ -157,6 +157,16 @@ This will check that:
 
 ---
 
+## 🏁 Start Training on < 24gb vram
+
+To begin training with your configuration file (e.g., `train_lora_4090.yaml`), run:
+
+```bash
+accelerate launch train_4090.py --config ./train_configs/train_lora_4090.yaml
+```
+![Sample Output](./assets/Valentin_24gb.jpg)
+
+
 ## 🏁 Start Training
 
 To begin training with your configuration file (e.g., `train_lora.yaml`), run:
