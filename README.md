@@ -32,9 +32,11 @@ Agentic Infra for GenAI. FlyMy.AI is a B2B infrastructure for building and runni
 
 ## 📅 Updates
 
+**09.08.2025**
+- ✅ Add pipeline for train for < 24GiB GPU
+
 **08.08.2025**
 - ✅ Added comprehensive dataset preparation instructions
-- ✅ Added automatic checkpoint saving in ComfyUI compatible format
 - ✅ Added dataset validation script (`utils/validate_dataset.py`)
 - ✅ Freeze model weights during training
 
