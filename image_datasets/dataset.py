@@ -72,7 +72,7 @@ class CustomImageDataset(Dataset):
         return 999999
 
     def __getitem__(self, idx):
-        if 1:
+        try:
             idx = random.randint(0, len(self.images) - 1)
             if self.cached_image_embeddings is None:
                 img = Image.open(self.images[idx]).convert('RGB')
@@ -102,11 +102,9 @@ class CustomImageDataset(Dataset):
                     return img, self.cached_text_embeddings['empty_embedding']['prompt_embeds'], self.cached_text_embeddings['empty_embedding']['prompt_embeds_mask']
                 else:
                     return img, self.cached_text_embeddings[txt]['prompt_embeds'], self.cached_text_embeddings[txt]['prompt_embeds_mask']
-        '''
         except Exception as e:
             print(e)
             return self.__getitem__(random.randint(0, len(self.images) - 1))
-        '''
 
 def loader(train_batch_size, num_workers, **args):
     dataset = CustomImageDataset(**args)
