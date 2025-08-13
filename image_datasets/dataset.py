@@ -105,12 +105,10 @@ class CustomImageDataset(Dataset):
                 if throw_one(self.caption_dropout_rate):
                     txt_path = os.path.join(self.txt_cache_dir, 'empty_embedding.pt')
                     txt_embs = torch.load(txt_path)
-                    print(1241245125125)
                     return img, txt_embs['prompt_embeds'], txt_embs['prompt_embeds_mask']
                 else:
                     txt_path = os.path.join(self.txt_cache_dir, txt_path.split('/')[-1] + '.pt')
                     txt_embs = torch.load(txt_path)
-                    print(1241245125125)
 
                     return img, txt_embs['prompt_embeds'], txt_embs['prompt_embeds_mask']
             else:
