@@ -134,9 +134,18 @@ def main():
     )
     text_encoding_pipeline.to(accelerator.device)
     cached_text_embeddings = None
+    txt_cache_dir = None
+    if args.precompute_text_embeddings or args.precompute_image_embeddings:
+        if accelerator.is_main_process:
+            cache_dir = os.path.join(args.output_dir, "cache")
+            os.makedirs(cache_dir, exist_ok=True)
     if args.precompute_text_embeddings:
         with torch.no_grad():
-            cached_text_embeddings = {}
+            if args.save_cache_on_disk:
+                txt_cache_dir = os.path.join(cache_dir, "text_embs")
+                os.makedirs(txt_cache_dir, exist_ok=True)
+            else:
+                cached_text_embeddings = {}
             for txt in tqdm([i for i in os.listdir(args.data_config.img_dir) if ".txt" in i]):
                 txt_path = os.path.join(args.data_config.img_dir, txt)
                 prompt = open(txt_path).read()
@@ -146,7 +155,10 @@ def main():
                     num_images_per_prompt=1,
                     max_sequence_length=1024,
                 )
-                cached_text_embeddings[txt] = {'prompt_embeds': prompt_embeds[0].to('cpu'), 'prompt_embeds_mask': prompt_embeds_mask[0].to('cpu')}
+                if args.save_cache_on_disk:
+                    torch.save({'prompt_embeds': prompt_embeds[0].to('cpu'), 'prompt_embeds_mask': prompt_embeds_mask[0].to('cpu')}, os.path.join(txt_cache_dir, txt + '.pt'))
+                else:
+                    cached_text_embeddings[txt] = {'prompt_embeds': prompt_embeds[0].to('cpu'), 'prompt_embeds_mask': prompt_embeds_mask[0].to('cpu')}
             # compute empty embedding
             prompt_embeds, prompt_embeds_mask = text_encoding_pipeline.encode_prompt(
                 prompt=[' '],
@@ -154,7 +166,13 @@ def main():
                 num_images_per_prompt=1,
                 max_sequence_length=1024,
             )
-            cached_text_embeddings['empty_embedding'] = {'prompt_embeds': prompt_embeds[0].to('cpu'), 'prompt_embeds_mask': prompt_embeds_mask[0].to('cpu')}
+            if args.save_cache_on_disk:
+                torch.save({'prompt_embeds': prompt_embeds[0].to('cpu'), 'prompt_embeds_mask': prompt_embeds_mask[0].to('cpu')}, os.path.join(txt_cache_dir, 'empty_embedding.pt'))
+                del prompt_embeds
+                del prompt_embeds_mask
+            else:
+                cached_text_embeddings['empty_embedding'] = {'prompt_embeds': prompt_embeds[0].to('cpu'), 'prompt_embeds_mask': prompt_embeds_mask[0].to('cpu')}
+                    
         text_encoding_pipeline.to("cpu")
         torch.cuda.empty_cache()
     del text_encoding_pipeline
@@ -167,8 +185,13 @@ def main():
     )
     vae.to(accelerator.device, dtype=weight_dtype)
     cached_image_embeddings = None
+    img_cache_dir = None
     if args.precompute_image_embeddings:
-        cached_image_embeddings = {}
+        if args.save_cache_on_disk:
+            img_cache_dir = os.path.join(cache_dir, "img_embs")
+            os.makedirs(img_cache_dir, exist_ok=True)
+        else:
+            cached_image_embeddings = {}
         with torch.no_grad():
             for img_name in tqdm([i for i in os.listdir(args.data_config.img_dir) if ".png" in i or ".jpg" in i]):
                 img = Image.open(os.path.join(args.data_config.img_dir, img_name)).convert('RGB')
@@ -183,11 +206,15 @@ def main():
                 pixel_values = pixel_values.to(dtype=weight_dtype).to(accelerator.device)
         
                 pixel_latents = vae.encode(pixel_values).latent_dist.sample().to('cpu')[0]
-                cached_image_embeddings[img_name] = pixel_latents
+                if args.save_cache_on_disk:
+                    torch.save(pixel_latents, os.path.join(img_cache_dir, img_name + '.pt'))
+                    del pixel_latents
+                else:
+                    cached_image_embeddings[img_name] = pixel_latents
         vae.to('cpu')
         torch.cuda.empty_cache()
     #del vae
-    #gc.collect()
+    gc.collect()
     flux_transformer = QwenImageTransformer2DModel.from_pretrained(
         args.pretrained_model_name_or_path,
         subfolder="transformer",    )
@@ -263,7 +290,8 @@ def main():
             weight_decay=args.adam_weight_decay,
             eps=args.adam_epsilon,
         )
-    train_dataloader = loader(cached_text_embeddings=cached_text_embeddings, cached_image_embeddings=cached_image_embeddings, **args.data_config)
+    train_dataloader = loader(cached_text_embeddings=cached_text_embeddings, cached_image_embeddings=cached_image_embeddings, 
+                              txt_cache_dir=txt_cache_dir, img_cache_dir=img_cache_dir, **args.data_config)
 
     lr_scheduler = get_scheduler(
         args.lr_scheduler,
