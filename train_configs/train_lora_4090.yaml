@@ -31,3 +31,4 @@ precompute_text_embeddings: true
 precompute_image_embeddings: true
 quantize: true
 adam8bit: true
+save_cache_on_disk: true
