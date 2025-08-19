@@ -94,7 +94,7 @@ class CustomImageDataset(Dataset):
                 img = torch.load(os.path.join(self.img_cache_dir, self.images[idx].split('/')[-1] + '.pt'))
             else:
                 img = self.cached_image_embeddings[self.images[idx].split('/')[-1]]
-            txt_path = self.images[idx].split('.')[0] + '.' + self.caption_type
+            txt_path = self.images[idx].rsplit('.', 1)[0] + '.' + self.caption_type
             if self.cached_text_embeddings is None and self.txt_cache_dir is None:
                 prompt = open(txt_path).read()
                 if throw_one(self.caption_dropout_rate):
