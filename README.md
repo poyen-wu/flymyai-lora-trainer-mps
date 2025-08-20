@@ -1,8 +1,8 @@
-# LoRA Training for Qwen-Image
+# LoRA Training for Qwen-Image & Qwen-Image-Edit
 
 
 
-An open-source implementation for training LoRA (Low-Rank Adaptation) layers for Qwen/Qwen-Image models by [FlyMy.AI](https://flymy.ai).
+An open-source implementation for training LoRA (Low-Rank Adaptation) layers for Qwen/Qwen-Image and Qwen/Qwen-Image-Edit models by [FlyMy.AI](https://flymy.ai).
 
 <p align="center">
   <img src="./assets/flymy_transparent.png" alt="FlyMy.AI Logo" width="256">
@@ -26,11 +26,16 @@ Agentic Infra for GenAI. FlyMy.AI is a B2B infrastructure for building and runni
 ## 🚀 Features
 
 - LoRA-based fine-tuning for efficient training
+- Support for both Qwen-Image and Qwen-Image-Edit models
 - Compatible with Hugging Face `diffusers`
 - Easy configuration via YAML
+- Control-based image editing with LoRA
 - Open-source implementation for LoRA training
 
 ## 📅 Updates
+
+**20.08.2025**
+- ✅ Added Qwen-Image-Edit LoRA trainer support
 
 **09.08.2025**
 - ✅ Add pipeline for train for < 24GiB GPU
@@ -83,7 +88,7 @@ Agentic Infra for GenAI. FlyMy.AI is a B2B infrastructure for building and runni
 
 ## 📁 Data Preparation
 
-### Dataset Structure
+### Dataset Structure for Qwen-Image Training
 
 The training data should follow the same format as Flux LoRA training, where each image has a corresponding text file with the same name:
 
@@ -98,6 +103,23 @@ dataset/
 └── ...
 ```
 
+### Dataset Structure for Qwen-Image-Edit Training
+
+For control-based image editing, the dataset should be organized with separate directories for target images/captions and control images:
+
+```
+dataset/
+├── images/           # Target images and their captions
+│   ├── image_001.jpg
+│   ├── image_001.txt
+│   ├── image_002.jpg
+│   ├── image_002.txt
+│   └── ...
+└── control/          # Control images
+    ├── image_001.jpg
+    ├── image_002.jpg
+    └── ...
+```
 ### Data Format Requirements
 
 1. **Images**: Support common formats (PNG, JPG, JPEG, WEBP)
@@ -171,6 +193,8 @@ accelerate launch train_4090.py --config ./train_configs/train_lora_4090.yaml
 
 ## 🏁 Start Training
 
+### Qwen-Image LoRA Training
+
 To begin training with your configuration file (e.g., `train_lora.yaml`), run:
 
 ```bash
@@ -178,10 +202,28 @@ accelerate launch train.py --config ./train_configs/train_lora.yaml
 ```
 
 Make sure `train_lora.yaml` is correctly set up with paths to your dataset, model, output directory, and other parameters.
+
+### Qwen-Image-Edit LoRA Training
+
+For control-based image editing training, use the specialized training script:
+
+```bash
+accelerate launch train_qwen_edit_lora.py --config ./train_configs/train_lora_qwen_edit.yaml
+```
+
+#### Configuration for Qwen-Image-Edit
+
+The configuration file `train_lora_qwen_edit.yaml` should include:
+
+- `img_dir`: Path to target images and captions directory (e.g., `./extracted_dataset/train/images`)
+- `control_dir`: Path to control images directory (e.g., `./extracted_dataset/train/control`)
+- Other standard LoRA training parameters
+
+```
 ## 🧪 Usage
 
 ---
-### 🔧 Initialization
+### 🔧 Qwen-Image Initialization
 
 ```python
 from diffusers import DiffusionPipeline
@@ -201,14 +243,34 @@ pipe = DiffusionPipeline.from_pretrained(model_name, torch_dtype=torch_dtype)
 pipe = pipe.to(device)
 ```
 
+### 🔧 Qwen-Image-Edit Initialization
+
+```python
+from diffusers import QwenImageEditPipeline
+import torch
+from PIL import Image
+
+# Load the pipeline
+pipeline = QwenImageEditPipeline.from_pretrained("Qwen/Qwen-Image-Edit")
+pipeline.to(torch.bfloat16)
+pipeline.to("cuda")
+```
+
 ### 🔌 Load LoRA Weights
 
+For Qwen-Image:
 ```python
 # Load LoRA weights
 pipe.load_lora_weights('flymy-ai/qwen-image-realism-lora', adapter_name="lora")
 ```
 
-### 🎨 Generate Image with lora trained on person
+For Qwen-Image-Edit:
+```python
+# Load trained LoRA weights
+pipeline.load_lora_weights("/path/to/your/trained/lora/pytorch_lora_weights.safetensors")
+```
+
+### 🎨 Generate Image with Qwen-Image LoRA
 You can find LoRA weights [here](https://huggingface.co/flymy-ai/qwen-image-realism-lora)
 
 No trigger word required
@@ -231,9 +293,51 @@ image.show()
 image.save("output.png")
 ```
 
-### 🖼️ Sample Output
+### 🎨 Edit Image with Qwen-Image-Edit LoRA
+
+```python
+# Load input image
+image = Image.open("/path/to/your/input/image.jpg").convert("RGB")
+
+# Define editing prompt
+prompt = "Make a shot in the same scene of the person moving further away from the camera, keeping the camera steady to maintain focus on the central subject, gradually zooming out to capture more of the surrounding environment as the figure becomes less detailed in the distance."
+
+# Generate edited image
+inputs = {
+    "image": image,
+    "prompt": prompt,
+    "generator": torch.manual_seed(0),
+    "true_cfg_scale": 4.0,
+    "negative_prompt": " ",
+    "num_inference_steps": 50,
+}
+
+with torch.inference_mode():
+    output = pipeline(**inputs)
+    output_image = output.images[0]
+    output_image.save("edited_image.png")
+```
+
+### 🖼️ Sample Output - Qwen-Image
 
 ![Sample Output](./assets/lora.png)
+
+### 🖼️ Sample Output - Qwen-Image-Edit
+
+**Input Image:**
+
+![Input Image](./assets/qie2_orig.jpg)
+
+**Prompt:** 
+"Make a shot in the same scene of the left hand securing the edge of the cutting board while the right hand tilts it, causing the chopped tomatoes to slide off into the pan, camera angle shifts slightly to the left to center more on the pan."
+
+**Output without LoRA:**
+
+![Output without LoRA](./assets/qie2_orig.jpg)
+
+**Output with LoRA:**
+
+![Output with LoRA](./assets/qie2_lora.jpg)
 
 ---
 

@@ -374,7 +374,6 @@ def main():
                     img, prompt_embeds, prompt_embeds_mask, control_img = batch
                     prompt_embeds, prompt_embeds_mask = prompt_embeds.to(dtype=weight_dtype).to(accelerator.device), prompt_embeds_mask.to(dtype=torch.int32).to(accelerator.device)
                     control_img = control_img.to(dtype=weight_dtype).to(accelerator.device)
-                    print(control_img.shape, img.shape)
                     
                 else:
                     img, prompts = batch
