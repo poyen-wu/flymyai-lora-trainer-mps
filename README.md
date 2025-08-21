@@ -59,6 +59,9 @@ Agentic Infra for GenAI. FlyMy.AI is a B2B infrastructure for building and runni
 
 ## 📦 Installation
 
+**Requirements:**
+- Python 3.10
+
 1. Clone the repository and navigate into it:
    ```bash
    git clone https://github.com/FlyMyAI/flymyai-lora-trainer
