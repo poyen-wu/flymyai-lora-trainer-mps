@@ -14,11 +14,11 @@ data_config:
 # Training parameters
 train_batch_size: 1
 output_dir: ./output_full_training
-max_train_steps: 100000
+max_train_steps: 30000
 num_train_epochs: 1
 
 # Optimizer settings
-learning_rate: 3e-4  # Lower learning rate for full training
+learning_rate: 6e-4  # Lower learning rate for full training
 use_8bit_adam: true  # Use 8-bit Adam to save memory
 adam_beta1: 0.9
 adam_beta2: 0.999
@@ -31,7 +31,7 @@ lr_warmup_steps: 1000
 
 # Gradient settings
 max_grad_norm: 1.0
-gradient_accumulation_steps: 1  # Increase for effective batch size
+gradient_accumulation_steps: 4  # Increase for effective batch size
 
 # Precision and memory
 mixed_precision: "bf16"  # Use bfloat16 for better stability
