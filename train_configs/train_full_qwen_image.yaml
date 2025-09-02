@@ -7,7 +7,7 @@ data_config:
   num_workers: 4
   img_size: 1024
   caption_dropout_rate: 0.1
-  img_dir: /root/flymyai-lora-trainer/lora_dataset
+  img_dir: /path/to/your/dataset
   random_ratio: false
   caption_type: txt
 
