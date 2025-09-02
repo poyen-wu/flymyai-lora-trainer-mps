@@ -7,18 +7,18 @@ data_config:
   num_workers: 4
   img_size: 1024
   caption_dropout_rate: 0.1
-  img_dir: ./path/to/your/dataset
+  img_dir: /root/flymyai-lora-trainer/lora_dataset
   random_ratio: false
   caption_type: txt
 
 # Training parameters
 train_batch_size: 1
 output_dir: ./output_full_training
-max_train_steps: 10000
+max_train_steps: 100000
 num_train_epochs: 1
 
 # Optimizer settings
-learning_rate: 5e-5  # Lower learning rate for full training
+learning_rate: 3e-4  # Lower learning rate for full training
 use_8bit_adam: true  # Use 8-bit Adam to save memory
 adam_beta1: 0.9
 adam_beta2: 0.999
@@ -40,8 +40,8 @@ freeze_text_encoder: true  # Keep text encoder frozen to save memory
 # Logging and checkpointing
 logging_dir: logs
 report_to: null  # Can be "wandb", "tensorboard", etc.
-checkpointing_steps: 500
-checkpoints_total_limit: 5
+checkpointing_steps: 1000
+checkpoints_total_limit: 2
 tracker_project_name: qwen_image_full_training
 
 # Resume training
