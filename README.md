@@ -8,7 +8,9 @@ An open-source implementation for training LoRA (Low-Rank Adaptation) layers for
   <img src="./assets/flymy_transparent.png" alt="FlyMy.AI Logo" width="256">
 </p>
 
-<iframe style="width:100%;height:auto;min-width:600px;min-height:400px;" src="https://www.star-history.com/embed?secret=#antgroup/ditto-talkinghead&FlyMyAI/flymyai-lora-trainer&bmaltais/kohya_ss&Date" frameBorder="0"></iframe>
+## Star History
+
+[![Star History Chart](https://api.star-history.com/svg?repos=FlyMyAI/flymyai-lora-trainer&type=Date)](https://www.star-history.com/#FlyMyAI/flymyai-lora-trainer&Date)
 
 ## 🌟 About FlyMy.AI
 
