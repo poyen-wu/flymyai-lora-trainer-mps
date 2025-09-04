@@ -31,8 +31,12 @@ Agentic Infra for GenAI. FlyMy.AI is a B2B infrastructure for building and runni
 - Easy configuration via YAML
 - Control-based image editing with LoRA
 - Open-source implementation for LoRA training
+- Full training for Qwen-Image
 
 ## 📅 Updates
+
+**02.09.2025**
+- ✅ Added full training for Qwen-Image and Qwen-Image-Edit
 
 **20.08.2025**
 - ✅ Added Qwen-Image-Edit LoRA trainer support
@@ -206,6 +210,109 @@ accelerate launch train.py --config ./train_configs/train_lora.yaml
 
 Make sure `train_lora.yaml` is correctly set up with paths to your dataset, model, output directory, and other parameters.
 
+
+### Qwen-Image Full Training
+
+To begin training with your configuration file (e.g., `train_full_qwen_image.yaml`), run:
+
+```bash
+accelerate launch train_full_qwen_image.py --config ./train_configs/train_full_qwen_image.yaml
+```
+
+Make sure `train_full_qwen_image.yaml` is correctly set up with paths to your dataset, model, output directory, and other parameters.
+
+#### Loading Trained Full Model
+
+After training, you can load your trained model from the checkpoint directory for inference.
+
+**Simple Example:**
+
+```python
+from diffusers import QwenImagePipeline, QwenImageTransformer2DModel, AutoencoderKLQwenImage
+import torch
+from omegaconf import OmegaConf
+import os
+
+def load_trained_model(checkpoint_path):
+    """Load trained model from checkpoint"""
+    print(f"Loading trained model from: {checkpoint_path}")
+    
+    # Load config to get original model path
+    config_path = os.path.join(checkpoint_path, "config.yaml")
+    config = OmegaConf.load(config_path)
+    original_model_path = config.pretrained_model_name_or_path
+    
+    # Load trained transformer
+    transformer_path = os.path.join(checkpoint_path, "transformer")
+    transformer = QwenImageTransformer2DModel.from_pretrained(
+        transformer_path,
+        torch_dtype=torch.bfloat16,
+        low_cpu_mem_usage=True
+    )
+    transformer.to("cuda")
+    transformer.eval()
+    
+    # Load VAE from original model
+    vae = AutoencoderKLQwenImage.from_pretrained(
+        original_model_path,
+        subfolder="vae",
+        torch_dtype=torch.bfloat16
+    )
+    vae.to("cuda")
+    vae.eval()
+    
+    # Create pipeline
+    pipe = QwenImagePipeline.from_pretrained(
+        original_model_path,
+        transformer=transformer,
+        vae=vae,
+        torch_dtype=torch.bfloat16
+    )
+    pipe.to("cuda")
+    
+    print("Model loaded successfully!")
+    return pipe
+
+# Usage
+checkpoint_path = "/path/to/your/checkpoint"
+pipe = load_trained_model(checkpoint_path)
+
+# Generate image
+prompt = "A beautiful landscape with mountains and lake"
+image = pipe(
+    prompt=prompt,
+    width=768,
+    height=768,
+    num_inference_steps=30,
+    true_cfg_scale=5,
+    generator=torch.Generator(device="cuda").manual_seed(42)
+)
+
+# Save result
+output_image = image.images[0]
+output_image.save("generated_image.png")
+```
+
+**Complete Example Script:**
+
+```bash
+python inference_trained_model_gpu_optimized.py
+```
+
+**Checkpoint Structure:**
+
+The trained model is saved in the following structure:
+```
+checkpoint/
+├── config.yaml          # Training configuration
+└── transformer/         # Trained transformer weights
+    ├── config.json
+    ├── diffusion_pytorch_model.safetensors.index.json
+    └── diffusion_pytorch_model-00001-of-00005.safetensors
+    └── ... (multiple shard files)
+```
+
+
 ### Qwen-Image-Edit LoRA Training
 
 For control-based image editing training, use the specialized training script:
@@ -222,10 +329,18 @@ The configuration file `train_lora_qwen_edit.yaml` should include:
 - `control_dir`: Path to control images directory (e.g., `./extracted_dataset/train/control`)
 - Other standard LoRA training parameters
 
-```
 ## 🧪 Usage
 
+### Qwen-Image-Edit Full Training
+
+To begin training with your configuration file (e.g., `train_full_qwen_edit.yaml`), run:
+
+```bash
+accelerate launch train_full_qwen_edit.py --config ./train_configs/train_full_qwen_edit.yaml
+```
+
 ---
+
 ### 🔧 Qwen-Image Initialization
 
 ```python
