@@ -224,7 +224,7 @@ accelerate launch train_full_qwen_image.py --config ./train_configs/train_full_q
 ```
 
 Make sure `train_full_qwen_image.yaml` is correctly set up with paths to your dataset, model, output directory, and other parameters.
-
+The proposed method was tested on an NVIDIA H200 GPU environment.
 #### Loading Trained Full Model
 
 After training, you can load your trained model from the checkpoint directory for inference.
