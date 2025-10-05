@@ -10,6 +10,13 @@ import random
 def throw_one(probability: float) -> int:
     return 1 if random.random() < probability else 0
 
+def is_multiple_of_32(w, h):
+    return (w % 32 == 0) and (h % 32 == 0)
+
+def floor_to_multiple_of_32(w, h):
+    new_w = max(32, (w // 32) * 32)
+    new_h = max(32, (h // 32) * 32)
+    return new_w, new_h
 
 def image_resize(img, max_size=512):
     w, h = img.size
@@ -79,17 +86,21 @@ class CustomImageDataset(Dataset):
             idx = random.randint(0, len(self.images) - 1)
             if self.cached_image_embeddings is None and self.img_cache_dir is None:
                 img = Image.open(self.images[idx]).convert('RGB')
+
+                # optional augmentation: only run when the image is NOT already multiple-of-32
                 if self.random_ratio:
-                    ratio = random.choice(["16:9", "default", "1:1", "4:3"])
-                    if ratio != "default":
-                        img = crop_to_aspect_ratio(img, ratio)
-                img = image_resize(img, self.img_size)
+                    w0, h0 = img.size
+                    if not is_multiple_of_32(w0, h0):
+                        ratio = random.choice(["16:9", "default", "1:1", "4:3"])
+                        if ratio != "default":
+                            img = crop_to_aspect_ratio(img, ratio)
+
                 w, h = img.size
-                new_w = (w // 32) * 32
-                new_h = (h // 32) * 32
-                img = img.resize((new_w, new_h))
-                img = torch.from_numpy((np.array(img) / 127.5) - 1)
-                img = img.permute(2, 0, 1)
+                if not is_multiple_of_32(w, h):
+                    new_w, new_h = floor_to_multiple_of_32(w, h)
+                    img = img.resize((new_w, new_h), resample=Image.Resampling.LANCZOS)
+
+                img = torch.from_numpy((np.array(img, dtype=np.float32) / 127.5) - 1.0).permute(2, 0, 1)
             elif self.img_cache_dir is not None:
                 img = torch.load(os.path.join(self.img_cache_dir, self.images[idx].split('/')[-1] + '.pt'))
             else:

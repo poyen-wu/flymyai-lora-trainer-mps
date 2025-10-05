@@ -1,0 +1,45 @@
+pretrained_model_name_or_path: "Qwen/Qwen-Image-Edit-2509"
+
+# Logging/outputs
+output_dir: "./test_lora_saves_edit"
+logging_dir: "logs"
+tracker_project_name: "lora_test"
+report_to: null  # no tracker; use "tensorboard" or "wandb" if you want logging
+
+# Training
+train_batch_size: 1            # keep 1 unless your loader buckets by size
+gradient_accumulation_steps: 1
+max_train_steps: 1000
+mixed_precision: "bf16"        # MPS supports bf16/fp16/fp32; bf16 is a good default
+learning_rate: 2e-4
+lr_scheduler: "constant"
+lr_warmup_steps: 10
+adam_beta1: 0.9
+adam_beta2: 0.999
+adam_weight_decay: 0.01
+adam_epsilon: 1e-8
+max_grad_norm: 1.0
+checkpointing_steps: 250
+checkpoints_total_limit: 10
+resume_from_checkpoint: "latest"
+
+# LoRA
+rank: 16
+
+# Caching/quantization (script also enforces these defaults)
+precompute_text_embeddings: true
+precompute_image_embeddings: true
+save_cache_on_disk: false
+quantize: false       # disable quanto on MPS
+adam8bit: false       # bitsandbytes is CUDA-only
+
+# Data config (the script keeps original sizes; only resizes to nearest multiple-of-32 if needed)
+data_config:
+  train_batch_size: 1
+  num_workers: 4
+  img_dir: "./images"           # images + matching .txt prompts (same basename)
+  control_dir: "./control_images"
+  caption_type: "txt"
+  caption_dropout_rate: 0.1
+  img_size: 1024                # typically unused by the updated script; kept for loader compatibility
+  random_ratio: false           # leave false; we’re not doing multi-crop here
