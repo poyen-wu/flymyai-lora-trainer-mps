@@ -95,7 +95,7 @@ def lora_processors(model):
 
 def main():
     args = OmegaConf.load(parse_args())
-    args.save_cache_on_disk = False
+    args.save_cache_on_disk = True
     args.precompute_text_embeddings = True
     args.precompute_image_embeddings = True
 
